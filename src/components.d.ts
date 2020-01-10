@@ -7,7 +7,14 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-
+import {
+  Outlet,
+  Pipe,
+  Pluck,
+} from 'plumbing-toolkit';
+import {
+  SinkMode,
+} from './types';
 
 export namespace Components {
   interface MyComponent {
@@ -24,6 +31,13 @@ export namespace Components {
     */
     'middle': string;
   }
+  interface PipeSink {
+    'clearOnUpdate': boolean;
+    'connect'?: (outlet: Outlet<any>, pipe?: Pipe<any>) => Pluck;
+    'mode': SinkMode;
+    'pipe'?: Pipe<any>;
+    'pluck': () => Promise<void>;
+  }
 }
 
 declare global {
@@ -34,8 +48,15 @@ declare global {
     prototype: HTMLMyComponentElement;
     new (): HTMLMyComponentElement;
   };
+
+  interface HTMLPipeSinkElement extends Components.PipeSink, HTMLStencilElement {}
+  var HTMLPipeSinkElement: {
+    prototype: HTMLPipeSinkElement;
+    new (): HTMLPipeSinkElement;
+  };
   interface HTMLElementTagNameMap {
     'my-component': HTMLMyComponentElement;
+    'pipe-sink': HTMLPipeSinkElement;
   }
 }
 
@@ -54,9 +75,16 @@ declare namespace LocalJSX {
     */
     'middle'?: string;
   }
+  interface PipeSink {
+    'clearOnUpdate'?: boolean;
+    'connect'?: (outlet: Outlet<any>, pipe?: Pipe<any>) => Pluck;
+    'mode'?: SinkMode;
+    'pipe'?: Pipe<any>;
+  }
 
   interface IntrinsicElements {
     'my-component': MyComponent;
+    'pipe-sink': PipeSink;
   }
 }
 
@@ -67,6 +95,7 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'my-component': LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+      'pipe-sink': LocalJSX.PipeSink & JSXBase.HTMLAttributes<HTMLPipeSinkElement>;
     }
   }
 }
